@@ -43,10 +43,9 @@ export default function TitleBar({
 
   const handleOpen = async () => {
     if (isElectron) {
-      const filePath = await electronAPI.openFile();
-      if (filePath) {
-        // The file will be handled by the parent component
-        onOpen();
+      const result = await electronAPI.openBookDialog();
+      if (!result.success && !result.canceled) {
+        console.error('Erro ao abrir livro:', result.error);
       }
     } else {
       onOpen();

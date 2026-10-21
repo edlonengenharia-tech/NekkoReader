@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog, powerSaveBlocker } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const { extractBook } = require('./book-extractor.cjs');
 
 let mainWindow = null;
 let powerSaveBlockerId = null;
@@ -159,6 +160,50 @@ ipcMain.handle('fs:stat', async (event, filePath) => {
 
 ipcMain.handle('fs:getAppData', () => {
   return app.getPath('userData');
+});
+
+// Book extraction handlers
+ipcMain.handle('book:open', async (event, filePath) => {
+  try {
+    // Send progress update
+    mainWindow.webContents.send('book:progress', { status: 'extracting', message: 'Extraindo páginas...' });
+    
+    const result = await extractBook(filePath);
+    
+    if (result.success) {
+      // Send success with book data
+      mainWindow.webContents.send('book:loaded', {
+        filePath: filePath,
+        fileName: path.basename(filePath),
+        pages: result.pages,
+        totalPages: result.totalPages
+      });
+      return { success: true };
+    } else {
+      mainWindow.webContents.send('book:error', { error: result.error });
+      return { success: false, error: result.error };
+    }
+  } catch (error) {
+    mainWindow.webContents.send('book:error', { error: error.message });
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('book:openDialog', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openFile'],
+    filters: [
+      { name: 'Mangá/HQ/Livros', extensions: ['cbz', 'cbr', 'pdf'] },
+      { name: 'Todos os arquivos', extensions: ['*'] }
+    ]
+  });
+  
+  if (!result.canceled && result.filePaths.length > 0) {
+    const filePath = result.filePaths[0];
+    return await ipcMain.handle('book:open', null, filePath);
+  }
+  
+  return { success: false, canceled: true };
 });
 
 // App lifecycle

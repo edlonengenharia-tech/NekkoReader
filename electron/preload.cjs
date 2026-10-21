@@ -21,12 +21,28 @@ contextBridge.exposeInMainWorld('electronAPI', {
   stat: (filePath) => ipcRenderer.invoke('fs:stat', filePath),
   getAppData: () => ipcRenderer.invoke('fs:getAppData'),
 
+  // Book operations
+  openBook: (filePath) => ipcRenderer.invoke('book:open', filePath),
+  openBookDialog: () => ipcRenderer.invoke('book:openDialog'),
+
   // Events
   onOpenFile: (callback) => {
     ipcRenderer.on('book:open-file', (event, filePath) => callback(filePath));
   },
-  removeOpenFileListener: () => {
+  onBookLoaded: (callback) => {
+    ipcRenderer.on('book:loaded', (event, bookData) => callback(bookData));
+  },
+  onBookProgress: (callback) => {
+    ipcRenderer.on('book:progress', (event, progress) => callback(progress));
+  },
+  onBookError: (callback) => {
+    ipcRenderer.on('book:error', (event, error) => callback(error));
+  },
+  removeBookListeners: () => {
     ipcRenderer.removeAllListeners('book:open-file');
+    ipcRenderer.removeAllListeners('book:loaded');
+    ipcRenderer.removeAllListeners('book:progress');
+    ipcRenderer.removeAllListeners('book:error');
   },
 
   // Platform info

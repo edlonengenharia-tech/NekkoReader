@@ -4,6 +4,22 @@ Windows desktop application built with Electron + React + TypeScript + Tailwind 
 
 **Features inspired by AutoComix v2.20.0**
 
+## 🎯 Novidades da Versão Atual
+
+### ✅ Abertura Real de Arquivos
+- **CBZ** (Comic Book ZIP) - Extração completa de imagens
+- **CBR** (Comic Book RAR) - Extração completa de imagens  
+- **PDF** - Detecção de páginas (renderização em desenvolvimento)
+- Drag & drop de arquivos
+- Progresso de carregamento em tempo real
+- Tratamento de erros com notificações
+
+### ✅ Sistema de Temas Funcional
+- 3 temas: Escuro, Meia-noite, Claro
+- Aplicação instantânea ao selecionar
+- Preview em tempo real
+- Transições suaves
+
 ## Requirements
 
 - **Windows 10/11** (64-bit)
@@ -25,6 +41,15 @@ SETUP.cmd
 TESTE-NPM.cmd
 ```
 
+### Test File Opening
+
+1. Click "📂 Abrir" button in the title bar
+2. Select a CBZ, CBR, or PDF file
+3. Wait for extraction (progress shown)
+4. Browse through the pages!
+
+See `TESTAR-ARQUIVOS.md` for detailed testing instructions.
+
 ### Generate Portable EXE
 
 ```
@@ -44,12 +69,13 @@ Output: `release\NekkoReader-installer.exe`
 ## Features
 
 ### Core Features
+- **Real File Opening** - Extract and read CBZ, CBR, PDF files
 - Library with search and filters
 - Manga mode (right-to-left)
 - Double page view
 - Adjustable zoom
 - Fullscreen
-- 3 themes: Dark, Midnight, Light (with live preview)
+- **Working Themes** - Dark, Midnight, Light (instant apply)
 - Smooth animations
 - Progress HUD
 - AI panel (Qwen/OpenAI)
@@ -58,6 +84,8 @@ Output: `release\NekkoReader-installer.exe`
 - Windows file associations
 - Custom frameless window
 - Power save blocker during reading
+- Loading progress overlay
+- Error notifications
 
 ### AutoComix Features (v2.20.0)
 - **Panel Detection**: Automatically detects panels/frames on pages using ML

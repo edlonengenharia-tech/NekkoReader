@@ -1,6 +1,20 @@
 // Electron API helper - provides a safe interface to Electron APIs
 // Falls back gracefully when running in browser mode
 
+interface BookPage {
+  id: number;
+  url: string;
+  alt: string;
+  fileName?: string;
+}
+
+interface BookData {
+  filePath: string;
+  fileName: string;
+  pages: BookPage[];
+  totalPages: number;
+}
+
 interface ElectronAPI {
   minimize: () => Promise<void>;
   maximize: () => Promise<void>;
@@ -14,8 +28,18 @@ interface ElectronAPI {
   readdir: (dirPath: string) => Promise<{ success: boolean; files?: string[]; error?: string }>;
   stat: (filePath: string) => Promise<{ success: boolean; stat?: { size: number; mtime: Date; isDirectory: boolean }; error?: string }>;
   getAppData: () => Promise<string>;
+  
+  // Book operations
+  openBook: (filePath: string) => Promise<{ success: boolean; error?: string }>;
+  openBookDialog: () => Promise<{ success: boolean; canceled?: boolean; error?: string }>;
+  
+  // Events
   onOpenFile: (callback: (filePath: string) => void) => void;
-  removeOpenFileListener: () => void;
+  onBookLoaded: (callback: (bookData: BookData) => void) => void;
+  onBookProgress: (callback: (progress: { status: string; message: string }) => void) => void;
+  onBookError: (callback: (error: { error: string }) => void) => void;
+  removeBookListeners: () => void;
+  
   platform: string;
   isElectron: boolean;
 }
@@ -73,10 +97,31 @@ export const electronAPI = {
     if (isElectron) return window.electronAPI!.getAppData();
     return '';
   },
+  
+  // Book operations
+  openBook: async (filePath: string) => {
+    if (isElectron) return window.electronAPI!.openBook(filePath);
+    return { success: false, error: 'Not in Electron' };
+  },
+  openBookDialog: async () => {
+    if (isElectron) return window.electronAPI!.openBookDialog();
+    return { success: false, error: 'Not in Electron' };
+  },
+  
+  // Events
   onOpenFile: (callback: (filePath: string) => void) => {
     if (isElectron) window.electronAPI!.onOpenFile(callback);
   },
-  removeOpenFileListener: () => {
-    if (isElectron) window.electronAPI!.removeOpenFileListener();
+  onBookLoaded: (callback: (bookData: any) => void) => {
+    if (isElectron) window.electronAPI!.onBookLoaded(callback);
+  },
+  onBookProgress: (callback: (progress: any) => void) => {
+    if (isElectron) window.electronAPI!.onBookProgress(callback);
+  },
+  onBookError: (callback: (error: any) => void) => {
+    if (isElectron) window.electronAPI!.onBookError(callback);
+  },
+  removeBookListeners: () => {
+    if (isElectron) window.electronAPI!.removeBookListeners();
   },
 };
