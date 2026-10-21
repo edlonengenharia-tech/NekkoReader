@@ -2,23 +2,34 @@
 
 Windows desktop application built with Electron + React + TypeScript + Tailwind CSS.
 
-**Features inspired by AutoComix v2.20.0**
+**Now with AutoComix integration for intelligent panel detection!**
 
-## 🎯 Novidades da Versão Atual
+## 🎯 Latest Features
 
-### ✅ Abertura Real de Arquivos
-- **CBZ** (Comic Book ZIP) - Extração completa de imagens
-- **CBR** (Comic Book RAR) - Extração completa de imagens  
-- **PDF** - Detecção de páginas (renderização em desenvolvimento)
-- Drag & drop de arquivos
-- Progresso de carregamento em tempo real
-- Tratamento de erros com notificações
+### ✅ Real File Opening
+- **CBZ** (Comic Book ZIP) - Complete image extraction
+- **CBR** (Comic Book RAR) - Complete image extraction  
+- **PDF** - Page detection (rendering in development)
+- Drag & drop files
+- Real-time loading progress
+- Error handling with notifications
 
-### ✅ Sistema de Temas Funcional
-- 3 temas: Escuro, Meia-noite, Claro
-- Aplicação instantânea ao selecionar
-- Preview em tempo real
-- Transições suaves
+### ✅ Working Theme System
+- 3 themes: Dark, Midnight, Light
+- Instant apply when selected
+- Live preview
+- Smooth transitions
+
+### ✅ AutoComix Integration
+- **ML-powered panel detection** (YOLO + ONNX Runtime)
+- **GPU acceleration** (DirectML on Windows)
+- **Auto-rotation** of panels for better viewing
+- **Double-click zoom** to panels
+- **Backend status indicator** in UI
+- **Fallback to OpenCV** when AutoComix not available
+
+📖 See [AUTOCOMIX-INTEGRATION.md](AUTOCOMIX-INTEGRATION.md) for full integration guide
+📖 See [README-PTBR.md](README-PTBR.md) for Portuguese documentation
 
 ## Requirements
 

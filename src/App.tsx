@@ -40,6 +40,7 @@ export default function App() {
   const [isDragging, setIsDragging] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState<{ status: string; message: string } | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [backendAvailable, setBackendAvailable] = useState(false);
   const mainRef = useRef<HTMLDivElement>(null);
 
   // Apply theme
@@ -73,6 +74,25 @@ export default function App() {
     };
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  // Check AutoComix backend availability
+  useEffect(() => {
+    const checkBackend = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/health');
+        if (response.ok) {
+          const data = await response.json();
+          setBackendAvailable(data.status === 'ok');
+        }
+      } catch (error) {
+        setBackendAvailable(false);
+      }
+    };
+
+    checkBackend();
+    const interval = setInterval(checkBackend, 10000); // Check every 10 seconds
+    return () => clearInterval(interval);
   }, []);
 
   // Electron book events
@@ -243,6 +263,7 @@ export default function App() {
         panelDetection={settings.panelDetection}
         autoRotatePanels={settings.autoRotatePanels}
         panelZoomOnDblClick={settings.panelZoomOnDblClick}
+        backendAvailable={backendAvailable}
       />
 
       <div className="flex flex-1 overflow-hidden">

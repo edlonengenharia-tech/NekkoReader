@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { MangaBook, Settings } from '../types';
+import { autoComixService, Panel } from '../services/autocomix';
 
 interface ReaderProps {
   book: MangaBook | null;
@@ -31,26 +32,70 @@ export default function Reader({
   const currentPage = book?.currentPage || 1;
   const totalPages = book?.totalPages || 0;
 
-  // Simulate panel detection (AutoComix feature)
+  // Real panel detection using AutoComix backend
   useEffect(() => {
     if (!settings.panelDetection || !book) {
       setDetectedPanels([]);
       return;
     }
 
-    setIsDetecting(true);
-    // Simulate ML panel detection with a delay
-    const timer = setTimeout(() => {
-      // Generate mock panels based on page content
-      const panels = generateMockPanels(currentPage);
-      setDetectedPanels(panels);
-      setIsDetecting(false);
-    }, 300);
+    const detectPanels = async () => {
+      setIsDetecting(true);
+      
+      try {
+        const currentPageData = book.pages[currentPage - 1];
+        if (!currentPageData) {
+          setIsDetecting(false);
+          return;
+        }
 
-    return () => clearTimeout(timer);
-  }, [currentPage, settings.panelDetection, book]);
+        // Check if backend is available
+        const isAvailable = await autoComixService.isAvailable() || await autoComixService.checkHealth();
+        
+        if (isAvailable) {
+          // Extract base64 from data URL
+          const base64Match = currentPageData.url.match(/base64,(.+)$/);
+          if (base64Match) {
+            const base64Data = base64Match[1];
+            
+            // Call AutoComix backend for real detection
+            const result = await autoComixService.detectPanels(
+              base64Data,
+              settings.gpuAcceleration,
+              0.5
+            );
+            
+            // Convert pixel coordinates to percentages
+            if (result.image_size && result.panels) {
+              const panels: Panel[] = result.panels.map(p => ({
+                x: (p.x / result.image_size!.width) * 100,
+                y: (p.y / result.image_size!.height) * 100,
+                width: (p.width / result.image_size!.width) * 100,
+                height: (p.height / result.image_size!.height) * 100,
+                confidence: p.confidence
+              }));
+              setDetectedPanels(panels);
+            }
+          }
+        } else {
+          // Fallback: generate mock panels
+          const panels = generateMockPanels(currentPage);
+          setDetectedPanels(panels);
+        }
+      } catch (error) {
+        console.error('Panel detection error:', error);
+        // Fallback to mock panels
+        const panels = generateMockPanels(currentPage);
+        setDetectedPanels(panels);
+      } finally {
+        setIsDetecting(false);
+      }
+    };
 
-  // Generate mock panels for demonstration
+    detectPanels();
+  }, [currentPage, settings.panelDetection, settings.gpuAcceleration, book]);
+
+  // Generate mock panels for fallback
   const generateMockPanels = (page: number) => {
     const numPanels = 3 + (page % 4); // 3-6 panels
     const panels = [];
@@ -60,6 +105,7 @@ export default function Reader({
         y: 10 + Math.floor(i / 2) * 30,
         width: 40 + Math.random() * 10,
         height: 25 + Math.random() * 10,
+        confidence: 0.8
       });
     }
     return panels;

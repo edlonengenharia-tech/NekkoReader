@@ -13,6 +13,7 @@ interface TitleBarProps {
   panelDetection: boolean;
   autoRotatePanels: boolean;
   panelZoomOnDblClick: boolean;
+  backendAvailable?: boolean;
 }
 
 export default function TitleBar({ 
@@ -27,7 +28,8 @@ export default function TitleBar({
   showLibrary,
   panelDetection,
   autoRotatePanels,
-  panelZoomOnDblClick
+  panelZoomOnDblClick,
+  backendAvailable = false
 }: TitleBarProps) {
   const handleMinimize = async () => {
     if (isElectron) await electronAPI.minimize();
@@ -128,6 +130,19 @@ export default function TitleBar({
         </button>
       </div>
       <div className="flex-1" />
+      
+      {/* Backend Status Indicator */}
+      <div className="flex items-center gap-2 mr-4" style={isElectron ? { WebkitAppRegion: 'no-drag' } as React.CSSProperties : undefined}>
+        <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full text-xs ${
+          backendAvailable 
+            ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+            : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+        }`}>
+          <div className={`w-1.5 h-1.5 rounded-full ${backendAvailable ? 'bg-green-400' : 'bg-yellow-400'} animate-pulse`} />
+          <span>{backendAvailable ? 'AutoComix' : 'Fallback'}</span>
+        </div>
+      </div>
+      
       <div className="flex items-center gap-1" style={isElectron ? { WebkitAppRegion: 'no-drag' } as React.CSSProperties : undefined}>
         {isElectron ? (
           <>
