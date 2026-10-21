@@ -9,20 +9,23 @@ let powerSaveBlockerId = null;
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
   app.quit();
-  return;
-}
-
-app.on('second-instance', (event, commandLine) => {
-  if (mainWindow) {
-    if (mainWindow.isMinimized()) mainWindow.restore();
-    mainWindow.focus();
-    // Handle file opened from command line
-    const filePath = commandLine.find(arg => arg.endsWith('.cbz') || arg.endsWith('.cbr') || arg.endsWith('.pdf') || arg.endsWith('.cbt') || arg.endsWith('.cb7'));
-    if (filePath) {
-      mainWindow.webContents.send('book:open-file', filePath);
+} else {
+  app.on('second-instance', (event, commandLine) => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+      const filePath = commandLine.find(arg =>
+        arg.endsWith('.cbz') || arg.endsWith('.cbr') || arg.endsWith('.pdf') ||
+        arg.endsWith('.cbt') || arg.endsWith('.cb7')
+      );
+      if (filePath) {
+        mainWindow.webContents.send('book:open-file', filePath);
+      }
     }
-  }
-});
+  });
+
+  app.whenReady().then(createWindow);
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -33,9 +36,8 @@ function createWindow() {
     frame: false,
     titleBarStyle: 'hidden',
     backgroundColor: '#1a1a2e',
-    icon: path.join(__dirname, 'assets', 'icon.png'),
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'preload.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false,
@@ -43,22 +45,18 @@ function createWindow() {
     show: false,
   });
 
-  // Load the built React app
   const indexPath = path.join(__dirname, '..', 'dist', 'index.html');
-  
+
   if (fs.existsSync(indexPath)) {
     mainWindow.loadFile(indexPath);
   } else {
-    // Development mode - load from dev server
     mainWindow.loadURL('http://localhost:3000');
-    mainWindow.webContents.openDevTools();
   }
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
   });
 
-  // Handle file drops
   mainWindow.webContents.on('will-navigate', (event) => {
     event.preventDefault();
   });
@@ -68,8 +66,8 @@ function createWindow() {
   });
 
   // Handle command line file argument
-  const filePath = process.argv.find(arg => 
-    arg.endsWith('.cbz') || arg.endsWith('.cbr') || arg.endsWith('.pdf') || 
+  const filePath = process.argv.find(arg =>
+    arg.endsWith('.cbz') || arg.endsWith('.cbr') || arg.endsWith('.pdf') ||
     arg.endsWith('.cbt') || arg.endsWith('.cb7')
   );
   if (filePath) {
@@ -81,31 +79,31 @@ function createWindow() {
 
 // IPC Handlers
 ipcMain.handle('window:minimize', () => {
-  mainWindow?.minimize();
+  mainWindow && mainWindow.minimize();
 });
 
 ipcMain.handle('window:maximize', () => {
-  if (mainWindow?.isMaximized()) {
+  if (mainWindow && mainWindow.isMaximized()) {
     mainWindow.unmaximize();
-  } else {
-    mainWindow?.maximize();
+  } else if (mainWindow) {
+    mainWindow.maximize();
   }
 });
 
 ipcMain.handle('window:close', () => {
-  mainWindow?.close();
+  mainWindow && mainWindow.close();
 });
 
 ipcMain.handle('window:isMaximized', () => {
-  return mainWindow?.isMaximized() || false;
+  return mainWindow ? mainWindow.isMaximized() : false;
 });
 
 ipcMain.handle('dialog:openFile', async () => {
   const result = await dialog.showOpenDialog(mainWindow, {
     properties: ['openFile'],
     filters: [
-      { name: 'Mangá/HQ/Livros', extensions: ['cbz', 'cbr', 'cbt', 'cb7', 'pdf', 'zip', 'rar', 'tar', '7z'] },
-      { name: 'Todos os arquivos', extensions: ['*'] }
+      { name: 'Manga/HQ/Livros', extensions: ['cbz', 'cbr', 'cbt', 'cb7', 'pdf', 'zip', 'rar', 'tar', '7z'] },
+      { name: 'All Files', extensions: ['*'] }
     ]
   });
   return result.filePaths[0] || null;
@@ -144,7 +142,7 @@ ipcMain.handle('fs:readFile', async (event, filePath) => {
 ipcMain.handle('fs:readdir', async (event, dirPath) => {
   try {
     const files = fs.readdirSync(dirPath);
-    return { success: true, files };
+    return { success: true, files: files };
   } catch (err) {
     return { success: false, error: err.message };
   }
@@ -164,8 +162,6 @@ ipcMain.handle('fs:getAppData', () => {
 });
 
 // App lifecycle
-app.whenReady().then(createWindow);
-
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
@@ -178,7 +174,6 @@ app.on('activate', () => {
   }
 });
 
-// Handle file associations on macOS
 app.on('open-file', (event, filePath) => {
   event.preventDefault();
   if (mainWindow) {

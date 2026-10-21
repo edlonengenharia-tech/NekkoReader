@@ -1,94 +1,82 @@
 @echo off
-chcp 65001 >nul 2>&1
 setlocal enabledelayedexpansion
 
 echo.
 echo ============================================
-echo   🐱 NekoReader - Gerar Instalador
+echo   NekoReader - Build NSIS Installer
 echo ============================================
 echo.
 
-:: Verificar se Node.js está instalado
+:: Check Node.js
 where node >nul 2>&1
 if %errorlevel% neq 0 (
-    echo ❌ Node.js não encontrado!
-    echo.
-    echo Por favor, instale o Node.js em: https://nodejs.org
-    echo.
+    echo ERROR: Node.js not found!
+    echo Please install Node.js from: https://nodejs.org
     pause
     exit /b 1
 )
 
-echo ✅ Node.js encontrado:
+echo OK: Node.js found
 node --version
 echo.
 
-:: Instalar dependências se necessário
+:: Install dependencies if needed
 if not exist "node_modules" (
-    echo 📦 Instalando dependências...
+    echo Installing dependencies...
     call npm install
     if %errorlevel% neq 0 (
-        echo ❌ Erro ao instalar dependências!
+        echo ERROR: Failed to install dependencies!
         pause
         exit /b 1
     )
-    echo ✅ Dependências instaladas com sucesso!
+    echo OK: Dependencies installed
     echo.
 )
 
-:: Criar ícone se não existir
+:: Create icon if not exists
 if not exist "electron\assets\icon.png" (
-    echo 🎨 Criando ícone placeholder...
-    node electron/create-icon.js
+    echo Creating placeholder icon...
+    node electron/create-icon.cjs
     echo.
 )
 
-:: Build do React app
-echo 🔨 Compilando aplicação React...
+:: Build React app
+echo Building React app...
 call npm run build
 if %errorlevel% neq 0 (
-    echo ❌ Erro ao compilar a aplicação!
+    echo ERROR: Build failed!
     pause
     exit /b 1
 )
-echo ✅ Build concluído!
+echo OK: Build complete
 echo.
 
-:: Corrigir paths para Electron
-echo 🔧 Ajustando paths para Electron...
-node electron/fix-paths.js
+:: Fix paths for Electron
+echo Fixing paths for Electron...
+node electron/fix-paths.cjs
 if %errorlevel% neq 0 (
-    echo ❌ Erro ao ajustar paths!
+    echo ERROR: Failed to fix paths!
     pause
     exit /b 1
 )
-echo ✅ Paths ajustados!
+echo OK: Paths fixed
 echo.
 
-:: Gerar Instalador NSIS
-echo 📦 Gerando instalador NSIS com Electron Builder...
-echo    (Isso pode levar alguns minutos...)
+:: Generate NSIS installer
+echo Generating NSIS installer...
+echo    (This may take a few minutes...)
 echo.
 
-:: Usar o electron-builder local
-set EBUILDER=node_modules\.bin\electron-builder.cmd
-if not exist "%EBUILDER%" (
-    echo ❌ electron-builder não encontrado!
-    echo Tente executar: npm install --save-dev electron-builder
-    pause
-    exit /b 1
-)
-
-"%EBUILDER%" --win nsis --config electron-builder.config.js
+node_modules\.bin\electron-builder.cmd --win nsis --config electron-builder.config.cjs
 
 if %errorlevel% neq 0 (
     echo.
-    echo ❌ Erro ao gerar o instalador!
+    echo ERROR: Failed to generate installer!
     echo.
-    echo Possíveis soluções:
-    echo   1. Verifique se tem espaço em disco suficiente
-    echo   2. Tente executar como Administrador
-    echo   3. Desative temporariamente o antivírus
+    echo Possible solutions:
+    echo   1. Check disk space
+    echo   2. Try running as Administrator
+    echo   3. Temporarily disable antivirus
     echo.
     pause
     exit /b 1
@@ -96,20 +84,19 @@ if %errorlevel% neq 0 (
 
 echo.
 echo ============================================
-echo   ✅ Instalador Gerado com Sucesso!
+echo   OK: Installer Generated Successfully!
 echo ============================================
 echo.
-echo 📁 Arquivo: release\NekoReader-installer.exe
+echo File: release\NekoReader-installer.exe
 echo.
-echo Este instalador irá:
-echo   - Instalar o NekoReader no sistema
-echo   - Criar atalhos no Desktop e Menu Iniciar
-echo   - Associar arquivos CBZ/CBR/CBT/CB7/PDF
+echo This installer will:
+echo   - Install NekoReader on the system
+echo   - Create Desktop and Start Menu shortcuts
+echo   - Associate CBZ/CBR/CBT/CB7/PDF files
 echo.
 
-:: Abrir a pasta release
 if exist "release\NekoReader-installer.exe" (
-    echo 🚀 Abrindo pasta release...
+    echo Opening release folder...
     explorer release
 )
 

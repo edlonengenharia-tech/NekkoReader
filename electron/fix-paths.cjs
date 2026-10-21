@@ -8,7 +8,7 @@ const distDir = path.join(__dirname, '..', 'dist');
 const indexFile = path.join(distDir, 'index.html');
 
 if (!fs.existsSync(indexFile)) {
-  console.error('❌ dist/index.html não encontrado. Rode "npm run build" primeiro.');
+  console.error('ERROR: dist/index.html not found. Run "npm run build" first.');
   process.exit(1);
 }
 
@@ -22,8 +22,8 @@ html = html.replace(/(src|href)="\/([^"]+)"/g, (match, attr, value) => {
   if (value.startsWith('http://') || value.startsWith('https://') || value.startsWith('//')) {
     return match; // Keep external URLs as-is
   }
-  return `${attr}="./${value}"`;
+  return attr + '="./' + value + '"';
 });
 
 fs.writeFileSync(indexFile, html, 'utf-8');
-console.log('✅ Paths corrigidos para Electron (relativos)');
+console.log('OK: Paths fixed for Electron (relative)');

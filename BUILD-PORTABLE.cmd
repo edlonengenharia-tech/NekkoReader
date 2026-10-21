@@ -1,110 +1,95 @@
 @echo off
-chcp 65001 >nul 2>&1
 setlocal enabledelayedexpansion
 
 echo.
 echo ============================================
-echo   🐱 NekoReader - Gerar EXE Portátil
+echo   NekoReader - Build Portable EXE
 echo ============================================
 echo.
 
-:: Verificar se Node.js está instalado
+:: Check Node.js
 where node >nul 2>&1
 if %errorlevel% neq 0 (
-    echo ❌ Node.js não encontrado!
-    echo.
-    echo Por favor, instale o Node.js em: https://nodejs.org
-    echo.
+    echo ERROR: Node.js not found!
+    echo Please install Node.js from: https://nodejs.org
     pause
     exit /b 1
 )
 
-echo ✅ Node.js encontrado:
+echo OK: Node.js found
 node --version
 echo.
 
-:: Instalar dependências se necessário
+:: Install dependencies if needed
 if not exist "node_modules" (
-    echo 📦 Instalando dependências...
+    echo Installing dependencies...
     call npm install
     if %errorlevel% neq 0 (
-        echo ❌ Erro ao instalar dependências!
+        echo ERROR: Failed to install dependencies!
         pause
         exit /b 1
     )
-    echo ✅ Dependências instaladas com sucesso!
+    echo OK: Dependencies installed
     echo.
 )
 
-:: Verificar se electron-builder está instalado
-where electron-builder >nul 2>&1
-if %errorlevel% neq 0 (
-    if not exist "node_modules\.bin\electron-builder.cmd" (
-        echo 📦 Instalando electron-builder...
-        call npm install --save-dev electron-builder
-        if %errorlevel% neq 0 (
-            echo ❌ Erro ao instalar electron-builder!
-            pause
-            exit /b 1
-        )
+:: Check electron-builder
+if not exist "node_modules\.bin\electron-builder.cmd" (
+    echo Installing electron-builder...
+    call npm install --save-dev electron-builder
+    if %errorlevel% neq 0 (
+        echo ERROR: Failed to install electron-builder!
+        pause
+        exit /b 1
     )
 )
-echo ✅ electron-builder encontrado!
+echo OK: electron-builder found
 echo.
 
-:: Criar ícone se não existir
+:: Create icon if not exists
 if not exist "electron\assets\icon.png" (
-    echo 🎨 Criando ícone placeholder...
-    node electron/create-icon.js
+    echo Creating placeholder icon...
+    node electron/create-icon.cjs
     echo.
 )
 
-:: Build do React app
-echo 🔨 Compilando aplicação React...
+:: Build React app
+echo Building React app...
 call npm run build
 if %errorlevel% neq 0 (
-    echo ❌ Erro ao compilar a aplicação!
+    echo ERROR: Build failed!
     pause
     exit /b 1
 )
-echo ✅ Build concluído!
+echo OK: Build complete
 echo.
 
-:: Corrigir paths para Electron
-echo 🔧 Ajustando paths para Electron...
-node electron/fix-paths.js
+:: Fix paths for Electron
+echo Fixing paths for Electron...
+node electron/fix-paths.cjs
 if %errorlevel% neq 0 (
-    echo ❌ Erro ao ajustar paths!
+    echo ERROR: Failed to fix paths!
     pause
     exit /b 1
 )
-echo ✅ Paths ajustados!
+echo OK: Paths fixed
 echo.
 
-:: Gerar EXE portátil
-echo 📦 Gerando EXE portátil com Electron Builder...
-echo    (Isso pode levar alguns minutos...)
+:: Generate portable EXE
+echo Generating portable EXE...
+echo    (This may take a few minutes...)
 echo.
 
-:: Usar o electron-builder local
-set EBUILDER=node_modules\.bin\electron-builder.cmd
-if not exist "%EBUILDER%" (
-    echo ❌ electron-builder não encontrado!
-    echo Tente executar: npm install --save-dev electron-builder
-    pause
-    exit /b 1
-)
-
-"%EBUILDER%" --win portable --config electron-builder.config.js
+node_modules\.bin\electron-builder.cmd --win portable --config electron-builder.config.cjs
 
 if %errorlevel% neq 0 (
     echo.
-    echo ❌ Erro ao gerar o EXE!
+    echo ERROR: Failed to generate EXE!
     echo.
-    echo Possíveis soluções:
-    echo   1. Verifique se tem espaço em disco suficiente
-    echo   2. Tente executar como Administrador
-    echo   3. Desative temporariamente o antivírus
+    echo Possible solutions:
+    echo   1. Check disk space
+    echo   2. Try running as Administrator
+    echo   3. Temporarily disable antivirus
     echo.
     pause
     exit /b 1
@@ -112,18 +97,16 @@ if %errorlevel% neq 0 (
 
 echo.
 echo ============================================
-echo   ✅ EXE Gerado com Sucesso!
+echo   OK: EXE Generated Successfully!
 echo ============================================
 echo.
-echo 📁 Arquivo: release\NekoReader-portable.exe
+echo File: release\NekoReader-portable.exe
 echo.
-echo Você pode copiar este arquivo para qualquer
-echo lugar e executá-lo sem instalação!
+echo You can copy this file anywhere and run it!
 echo.
 
-:: Abrir a pasta release
 if exist "release\NekoReader-portable.exe" (
-    echo 🚀 Abrindo pasta release...
+    echo Opening release folder...
     explorer release
 )
 

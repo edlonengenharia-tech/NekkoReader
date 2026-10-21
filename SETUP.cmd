@@ -1,86 +1,83 @@
 @echo off
-chcp 65001 >nul 2>&1
 setlocal enabledelayedexpansion
 
 echo.
 echo ============================================
-echo   🐱 NekoReader - Configuração Inicial
+echo   NekoReader - Initial Setup
 echo ============================================
 echo.
 
-:: Verificar se Node.js está instalado
+:: Check Node.js
 where node >nul 2>&1
 if %errorlevel% neq 0 (
-    echo ❌ Node.js não encontrado!
+    echo ERROR: Node.js not found!
     echo.
-    echo ╔══════════════════════════════════════════════╗
-    echo ║  Por favor, instale o Node.js primeiro:     ║
-    echo ║  https://nodejs.org (versão 18 ou superior) ║
-    echo ╚══════════════════════════════════════════════╝
+    echo Please install Node.js first:
+    echo https://nodejs.org (version 18 or higher)
     echo.
     pause
     exit /b 1
 )
 
-echo ✅ Node.js encontrado:
+echo OK: Node.js found
 node --version
 echo.
 
-:: Instalar dependências
-echo 📦 Instalando dependências npm...
-echo    (Isso pode levar alguns minutos na primeira vez...)
+:: Install dependencies
+echo Installing npm dependencies...
+echo    (This may take a few minutes the first time...)
 echo.
 call npm install
 if %errorlevel% neq 0 (
-    echo ❌ Erro ao instalar dependências!
+    echo ERROR: Failed to install dependencies!
     pause
     exit /b 1
 )
-echo ✅ Dependências instaladas!
+echo OK: Dependencies installed
 echo.
 
-:: Configurar package.json para Electron
-echo 🔧 Configurando package.json para Electron...
-node electron/setup.js
+:: Configure package.json for Electron
+echo Configuring package.json for Electron...
+node electron/setup.cjs
 if %errorlevel% neq 0 (
-    echo ❌ Erro ao configurar package.json!
+    echo ERROR: Failed to configure package.json!
     pause
     exit /b 1
 )
 echo.
 
-:: Criar ícone placeholder
-echo 🎨 Criando ícone placeholder...
-node electron/create-icon.js
+:: Create placeholder icon
+echo Creating placeholder icon...
+node electron/create-icon.cjs
 echo.
 
-:: Build inicial
-echo 🔨 Compilando aplicação...
+:: Initial build
+echo Building app...
 call npm run build
 if %errorlevel% neq 0 (
-    echo ❌ Erro ao compilar!
+    echo ERROR: Build failed!
     pause
     exit /b 1
 )
-echo ✅ Build concluído!
+echo OK: Build complete
 echo.
 
-:: Ajustar paths
-echo 🔧 Ajustando paths para Electron...
-node electron/fix-paths.js
+:: Fix paths
+echo Fixing paths for Electron...
+node electron/fix-paths.cjs
 echo.
 
 echo ============================================
-echo   ✅ Configuração Completa!
+echo   OK: Setup Complete!
 echo ============================================
 echo.
-echo Agora você pode:
+echo Now you can:
 echo.
-echo   🚀 TESTE-NPM.cmd        → Rodar o app
-echo   📦 BUILD-PORTABLE.cmd   → Gerar EXE portátil
-echo   📥 BUILD-INSTALLER.cmd  → Gerar instalador
+echo   TESTE-NPM.cmd        - Run the app
+echo   BUILD-PORTABLE.cmd   - Generate portable EXE
+echo   BUILD-INSTALLER.cmd  - Generate installer
 echo.
-echo Ou via npm:
+echo Or via npm:
 echo   npm run electron:dev
 echo   npm run electron:build
 echo   npm run electron:installer

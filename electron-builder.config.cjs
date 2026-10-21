@@ -1,7 +1,7 @@
 module.exports = {
   appId: "com.nekoreader.app",
   productName: "NekoReader",
-  copyright: "Copyright © 2026 NekoReader",
+  copyright: "Copyright 2026 NekoReader",
   
   directories: {
     output: "release",
@@ -25,7 +25,6 @@ module.exports = {
         arch: ["x64"]
       }
     ],
-    // icon: "electron/assets/icon.ico", // Descomente quando tiver um ícone .ico personalizado
     artifactName: "${productName}-${version}-${os}-${arch}.${ext}"
   },
   
@@ -39,9 +38,6 @@ module.exports = {
     createDesktopShortcut: true,
     createStartMenuShortcut: true,
     shortcutName: "NekoReader",
-    // installerIcon: "electron/assets/icon.ico", // Descomente quando tiver um ícone .ico
-    // uninstallerIcon: "electron/assets/icon.ico",
-    // installerHeaderIcon: "electron/assets/icon.ico",
     artifactName: "NekoReader-installer.exe"
   },
   
@@ -49,35 +45,35 @@ module.exports = {
     {
       ext: "cbz",
       name: "Comic Book ZIP",
-      description: "Arquivo de quadrinhos (CBZ)",
+      description: "Comic Book Archive (CBZ)",
       mimeType: "application/x-cbz",
       role: "Viewer"
     },
     {
       ext: "cbr",
       name: "Comic Book RAR",
-      description: "Arquivo de quadrinhos (CBR)",
+      description: "Comic Book Archive (CBR)",
       mimeType: "application/x-cbr",
       role: "Viewer"
     },
     {
       ext: "cbt",
       name: "Comic Book TAR",
-      description: "Arquivo de quadrinhos (CBT)",
+      description: "Comic Book Archive (CBT)",
       mimeType: "application/x-cbt",
       role: "Viewer"
     },
     {
       ext: "cb7",
       name: "Comic Book 7Z",
-      description: "Arquivo de quadrinhos (CB7)",
+      description: "Comic Book Archive (CB7)",
       mimeType: "application/x-cb7",
       role: "Viewer"
     },
     {
       ext: "pdf",
       name: "PDF Document",
-      description: "Documento PDF",
+      description: "PDF Document",
       mimeType: "application/pdf",
       role: "Viewer"
     }

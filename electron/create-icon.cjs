@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Simple PNG icon generator (creates a minimal valid PNG)
-// This is a 32x32 purple square - electron-builder will use it as fallback
+// This is a 1x1 purple pixel - electron-builder will use it as fallback
 
 // Minimal 1x1 PNG (purple pixel)
 const minimalPNG = Buffer.from([
@@ -21,25 +21,25 @@ const assetsDir = path.join(__dirname, 'assets');
 
 if (!fs.existsSync(assetsDir)) {
   fs.mkdirSync(assetsDir, { recursive: true });
-  console.log('📁 Pasta electron/assets criada');
+  console.log('Created electron/assets folder');
 }
 
 const iconPath = path.join(assetsDir, 'icon.png');
 if (!fs.existsSync(iconPath)) {
   fs.writeFileSync(iconPath, minimalPNG);
-  console.log('✅ Ícone placeholder criado em electron/assets/icon.png');
+  console.log('OK: Placeholder icon created at electron/assets/icon.png');
   console.log('');
-  console.log('💡 Para um ícone personalizado:');
-  console.log('   1. Crie uma imagem 512x512 PNG');
-  console.log('   2. Salve como electron/assets/icon.png');
-  console.log('   3. Para .ico, use: https://convertico.com/');
+  console.log('For a custom icon:');
+  console.log('  1. Create a 512x512 PNG image');
+  console.log('  2. Save as electron/assets/icon.png');
+  console.log('  3. For .ico, use: https://convertico.com/');
 } else {
-  console.log('✅ Ícone já existe em electron/assets/icon.png');
+  console.log('OK: Icon already exists at electron/assets/icon.png');
 }
 
 // Also create .ico placeholder (same minimal PNG, electron-builder will handle it)
 const icoPath = path.join(assetsDir, 'icon.ico');
 if (!fs.existsSync(icoPath)) {
   fs.writeFileSync(icoPath, minimalPNG);
-  console.log('✅ Ícone .ico placeholder criado');
+  console.log('OK: Placeholder .ico icon created');
 }
