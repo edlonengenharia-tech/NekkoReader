@@ -162,8 +162,8 @@ ipcMain.handle('fs:getAppData', () => {
   return app.getPath('userData');
 });
 
-// Book extraction handlers
-ipcMain.handle('book:open', async (event, filePath) => {
+// Função auxiliar para abrir livro
+async function openBookFile(filePath) {
   try {
     // Send progress update
     mainWindow.webContents.send('book:progress', { status: 'extracting', message: 'Extraindo páginas...' });
@@ -187,6 +187,11 @@ ipcMain.handle('book:open', async (event, filePath) => {
     mainWindow.webContents.send('book:error', { error: error.message });
     return { success: false, error: error.message };
   }
+}
+
+// Book extraction handlers
+ipcMain.handle('book:open', async (event, filePath) => {
+  return await openBookFile(filePath);
 });
 
 ipcMain.handle('book:openDialog', async () => {
@@ -200,7 +205,7 @@ ipcMain.handle('book:openDialog', async () => {
   
   if (!result.canceled && result.filePaths.length > 0) {
     const filePath = result.filePaths[0];
-    return await ipcMain.handle('book:open', null, filePath);
+    return await openBookFile(filePath);
   }
   
   return { success: false, canceled: true };
