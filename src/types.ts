@@ -29,6 +29,13 @@ export interface Settings {
   animation: boolean;
   clickZones: boolean;
   prefetchPages: number;
+  // AutoComix features
+  panelDetection: boolean;
+  autoRotatePanels: boolean;
+  rotateDirection: 'clockwise' | 'counterclockwise';
+  rotateThreshold: number;
+  panelZoomOnDblClick: boolean;
+  gpuAcceleration: boolean;
 }
 
 export type FilterType = 'all' | 'unread' | 'manga' | 'recent' | 'hq' | 'livro';

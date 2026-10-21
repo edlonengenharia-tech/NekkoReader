@@ -7,7 +7,7 @@ interface OptionsDialogProps {
   onClose: () => void;
 }
 
-type TabId = 'reading' | 'ui' | 'ai';
+type TabId = 'reading' | 'ui' | 'ai' | 'autocomix';
 
 export default function OptionsDialog({ settings, onSave, onClose }: OptionsDialogProps) {
   const [local, setLocal] = useState<Settings>({ ...settings });
@@ -20,6 +20,7 @@ export default function OptionsDialog({ settings, onSave, onClose }: OptionsDial
   const tabs: { id: TabId; label: string; icon: string }[] = [
     { id: 'reading', label: 'Leitura', icon: '📖' },
     { id: 'ui', label: 'Interface', icon: '🎨' },
+    { id: 'autocomix', label: 'AutoComix', icon: '🔍' },
     { id: 'ai', label: 'IA', icon: '🤖' },
   ];
 
@@ -147,6 +148,84 @@ export default function OptionsDialog({ settings, onSave, onClose }: OptionsDial
             </div>
           )}
 
+          {activeTab === 'autocomix' && (
+            <div className="space-y-4">
+              <div className="bg-gradient-to-r from-green-600/10 to-cyan-600/10 rounded-lg p-3 border border-green-500/20">
+                <p className="text-xs text-green-300">
+                  🔍 Funcionalidades inspiradas no AutoComix v2.20.0
+                </p>
+              </div>
+              
+              <OptionCheckbox
+                checked={local.panelDetection}
+                onChange={(v) => setLocal({ ...local, panelDetection: v })}
+                label="Detecção de painéis (quadros) nas páginas"
+              />
+              
+              <OptionCheckbox
+                checked={local.panelZoomOnDblClick}
+                onChange={(v) => setLocal({ ...local, panelZoomOnDblClick: v })}
+                label="Duplo clique em um painel para dar zoom"
+              />
+              
+              <OptionCheckbox
+                checked={local.autoRotatePanels}
+                onChange={(v) => setLocal({ ...local, autoRotatePanels: v })}
+                label="Rotação automática de painéis"
+              />
+              
+              {local.autoRotatePanels && (
+                <div className="ml-6 space-y-3 pl-4 border-l-2 border-gray-700">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm text-gray-300">Direção da rotação</label>
+                    <select
+                      value={local.rotateDirection}
+                      onChange={(e) => setLocal({ ...local, rotateDirection: e.target.value as Settings['rotateDirection'] })}
+                      className="bg-gray-800 border border-gray-700 rounded px-2 py-1 text-sm text-gray-200"
+                    >
+                      <option value="clockwise">Horário</option>
+                      <option value="counterclockwise">Anti-horário</option>
+                    </select>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm text-gray-300">Limiar de rotação</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="range"
+                        min="1.1"
+                        max="2.0"
+                        step="0.1"
+                        value={local.rotateThreshold}
+                        onChange={(e) => setLocal({ ...local, rotateThreshold: parseFloat(e.target.value) })}
+                        className="w-24"
+                      />
+                      <span className="text-xs text-gray-400 w-12">{local.rotateThreshold}x</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Painéis que ficam {local.rotateThreshold}x maiores quando rotacionados serão girados automaticamente.
+                  </p>
+                </div>
+              )}
+              
+              <OptionCheckbox
+                checked={local.gpuAcceleration}
+                onChange={(v) => setLocal({ ...local, gpuAcceleration: v })}
+                label="Aceleração por GPU (DirectML no Windows)"
+              />
+              
+              <div className="bg-gray-800/30 rounded-lg p-3 border border-gray-700/30">
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  💡 <b className="text-gray-400">Detecção de painéis:</b> Identifica automaticamente os quadros da página usando ML.
+                  <br />
+                  💡 <b className="text-gray-400">Zoom em painel:</b> Duplo clique em um quadro para dar zoom nele.
+                  <br />
+                  💡 <b className="text-gray-400">Auto-rotação:</b> Útil para tablets ou monitores rotacionáveis.
+                </p>
+              </div>
+            </div>
+          )}
+
           {activeTab === 'ai' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -246,21 +325,30 @@ function ThemePreview({ name, theme, active, onClick }: { name: string; theme: s
   const colors: Record<string, { bg: string; text: string }> = {
     dark: { bg: '#1a1a2e', text: '#e5e7eb' },
     midnight: { bg: '#0a0a1a', text: '#f3f4f6' },
-    light: { bg: '#f3f4f6', text: '#1f2937' },
+    light: { bg: '#f9fafb', text: '#111827' },
   };
   const c = colors[theme];
+  
+  const handleClick = () => {
+    // Apply theme immediately
+    document.documentElement.setAttribute('data-theme', theme);
+    document.body.style.backgroundColor = c.bg;
+    document.body.style.color = c.text;
+    onClick();
+  };
+  
   return (
     <button
-      onClick={onClick}
+      onClick={handleClick}
       className={`rounded-lg p-2 border-2 transition-all ${active ? 'border-purple-500 shadow-lg shadow-purple-500/20' : 'border-gray-700 hover:border-gray-600'}`}
     >
-      <div className="w-full h-12 rounded" style={{ backgroundColor: c.bg }}>
+      <div className="w-full h-12 rounded overflow-hidden" style={{ backgroundColor: c.bg }}>
         <div className="p-2">
           <div className="w-3/4 h-1 rounded" style={{ backgroundColor: c.text, opacity: 0.5 }} />
           <div className="w-1/2 h-1 rounded mt-1" style={{ backgroundColor: c.text, opacity: 0.3 }} />
         </div>
       </div>
-      <p className="text-[10px] text-gray-400 mt-1">{name}</p>
+      <p className="text-[10px] text-gray-400 mt-1 text-center">{name}</p>
     </button>
   );
 }

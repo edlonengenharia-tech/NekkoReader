@@ -1,7 +1,7 @@
 module.exports = {
-  appId: "com.nekoreader.app",
-  productName: "NekoReader",
-  copyright: "Copyright 2026 NekoReader",
+  appId: "com.nekkoreader.app",
+  productName: "NekkoReader",
+  copyright: "Copyright 2026 NekkoReader",
   
   directories: {
     output: "release",
@@ -29,7 +29,7 @@ module.exports = {
   },
   
   portable: {
-    artifactName: "NekoReader-portable.exe"
+    artifactName: "NekkoReader-portable.exe"
   },
   
   nsis: {
@@ -37,8 +37,8 @@ module.exports = {
     allowToChangeInstallationDirectory: true,
     createDesktopShortcut: true,
     createStartMenuShortcut: true,
-    shortcutName: "NekoReader",
-    artifactName: "NekoReader-installer.exe"
+    shortcutName: "NekkoReader",
+    artifactName: "NekkoReader-installer.exe"
   },
   
   fileAssociations: [

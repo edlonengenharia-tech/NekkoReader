@@ -84,6 +84,7 @@
   --text-primary: #f3f4f6;
   --text-secondary: #9ca3af;
   --accent: #8b5cf6;
+  --border-color: rgba(75, 85, 99, 0.5);
 }
 
 [data-theme="midnight"] {
@@ -93,6 +94,7 @@
   --text-primary: #f9fafb;
   --text-secondary: #6b7280;
   --accent: #6366f1;
+  --border-color: rgba(55, 65, 81, 0.5);
 }
 
 [data-theme="light"] {
@@ -102,6 +104,14 @@
   --text-primary: #111827;
   --text-secondary: #6b7280;
   --accent: #7c3aed;
+  --border-color: rgba(209, 213, 219, 0.5);
+}
+
+/* Apply theme to body */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Selection */

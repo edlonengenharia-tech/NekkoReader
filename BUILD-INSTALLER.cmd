@@ -3,7 +3,7 @@ setlocal enabledelayedexpansion
 
 echo.
 echo ============================================
-echo   NekoReader - Build NSIS Installer
+echo   NekkoReader - Build NSIS Installer
 echo ============================================
 echo.
 
@@ -87,7 +87,7 @@ echo ============================================
 echo   OK: Installer Generated Successfully!
 echo ============================================
 echo.
-echo File: release\NekoReader-installer.exe
+echo File: release\NekkoReader-installer.exe
 echo.
 echo This installer will:
 echo   - Install NekoReader on the system

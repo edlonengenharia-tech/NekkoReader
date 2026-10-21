@@ -3,7 +3,7 @@ setlocal enabledelayedexpansion
 
 echo.
 echo ============================================
-echo   NekoReader - Initial Setup
+echo   NekkoReader - Initial Setup
 echo ============================================
 echo.
 

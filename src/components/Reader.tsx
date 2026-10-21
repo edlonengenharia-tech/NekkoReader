@@ -21,11 +21,91 @@ export default function Reader({
   isFullscreen,
 }: ReaderProps) {
   const [showControls, setShowControls] = useState(true);
+  const [detectedPanels, setDetectedPanels] = useState<Array<{ x: number; y: number; width: number; height: number }>>([]);
+  const [panelZoom, setPanelZoom] = useState<{ x: number; y: number; scale: number } | null>(null);
+  const [isDetecting, setIsDetecting] = useState(false);
   const hideTimer = useRef<ReturnType<typeof setTimeout>>();
   const containerRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
 
   const currentPage = book?.currentPage || 1;
   const totalPages = book?.totalPages || 0;
+
+  // Simulate panel detection (AutoComix feature)
+  useEffect(() => {
+    if (!settings.panelDetection || !book) {
+      setDetectedPanels([]);
+      return;
+    }
+
+    setIsDetecting(true);
+    // Simulate ML panel detection with a delay
+    const timer = setTimeout(() => {
+      // Generate mock panels based on page content
+      const panels = generateMockPanels(currentPage);
+      setDetectedPanels(panels);
+      setIsDetecting(false);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [currentPage, settings.panelDetection, book]);
+
+  // Generate mock panels for demonstration
+  const generateMockPanels = (page: number) => {
+    const numPanels = 3 + (page % 4); // 3-6 panels
+    const panels = [];
+    for (let i = 0; i < numPanels; i++) {
+      panels.push({
+        x: 10 + (i % 2) * 45,
+        y: 10 + Math.floor(i / 2) * 30,
+        width: 40 + Math.random() * 10,
+        height: 25 + Math.random() * 10,
+      });
+    }
+    return panels;
+  };
+
+  // Handle double-click on panel for zoom (AutoComix feature)
+  const handleDoubleClick = useCallback((e: React.MouseEvent) => {
+    if (!settings.panelZoomOnDblClick || !imageRef.current) return;
+
+    const rect = imageRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+    // Check if click is within a detected panel
+    const clickedPanel = detectedPanels.find(panel =>
+      x >= panel.x && x <= panel.x + panel.width &&
+      y >= panel.y && y <= panel.y + panel.height
+    );
+
+    if (clickedPanel) {
+      // Zoom to panel
+      setPanelZoom({
+        x: clickedPanel.x + clickedPanel.width / 2,
+        y: clickedPanel.y + clickedPanel.height / 2,
+        scale: 2.5,
+      });
+    } else if (panelZoom) {
+      // Reset zoom
+      setPanelZoom(null);
+    }
+  }, [settings.panelZoomOnDblClick, detectedPanels, panelZoom]);
+
+  // Auto-rotate panels that would be larger when rotated (AutoComix feature)
+  const getPanelRotation = useCallback(() => {
+    if (!settings.autoRotatePanels) return 0;
+    
+    // Simulate checking if panel would be larger when rotated
+    // In real implementation, this would check actual panel dimensions
+    const aspectRatio = window.innerWidth / window.innerHeight;
+    const shouldRotate = aspectRatio > 1.3; // Landscape
+    
+    if (shouldRotate) {
+      return settings.rotateDirection === 'clockwise' ? 90 : -90;
+    }
+    return 0;
+  }, [settings.autoRotatePanels, settings.rotateDirection]);
 
   // Auto-hide controls
   const resetHideTimer = useCallback(() => {
@@ -174,7 +254,7 @@ export default function Reader({
           </div>
 
           <h1 className="text-5xl font-bold bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-3 tracking-tight">
-            NekoReader
+            NekkoReader
           </h1>
           <p className="text-purple-300/60 text-sm mb-6 font-medium tracking-wide uppercase">
             Leitor de Mangá, HQ e Livros
@@ -224,19 +304,62 @@ export default function Reader({
           style={{
             maxWidth: settings.fitMode === 'width' ? '100%' : settings.fitMode === 'page' ? '90vh' : 'auto',
             maxHeight: settings.fitMode === 'height' ? '100%' : settings.fitMode === 'page' ? '90vh' : 'auto',
-            transform: `scale(${settings.zoom / 100})`,
-            transformOrigin: 'center center',
+            transform: panelZoom 
+              ? `scale(${panelZoom.scale}) translate(${50 - panelZoom.x}%, ${50 - panelZoom.y}%)`
+              : `scale(${settings.zoom / 100}) rotate(${getPanelRotation()}deg)`,
+            transformOrigin: panelZoom ? `${panelZoom.x}% ${panelZoom.y}%` : 'center center',
+            transition: 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
           }}
+          onDoubleClick={handleDoubleClick}
         >
           {currentPageData && (
-            <img
-              src={currentPageData.url}
-              alt={currentPageData.alt}
-              className={`max-w-full max-h-full object-contain rounded shadow-2xl shadow-black/50 ${
-                settings.fitMode === 'width' ? 'w-full' : ''
-              } ${settings.fitMode === 'height' ? 'h-full' : ''}`}
-              draggable={false}
-            />
+            <>
+              <img
+                ref={imageRef}
+                src={currentPageData.url}
+                alt={currentPageData.alt}
+                className={`max-w-full max-h-full object-contain rounded shadow-2xl shadow-black/50 ${
+                  settings.fitMode === 'width' ? 'w-full' : ''
+                } ${settings.fitMode === 'height' ? 'h-full' : ''}`}
+                draggable={false}
+              />
+              {/* Panel detection overlay */}
+              {settings.panelDetection && detectedPanels.length > 0 && showControls && (
+                <div className="absolute inset-0 pointer-events-none">
+                  {detectedPanels.map((panel, idx) => (
+                    <div
+                      key={idx}
+                      className="absolute border-2 border-green-400/60 rounded-sm animate-pulse"
+                      style={{
+                        left: `${panel.x}%`,
+                        top: `${panel.y}%`,
+                        width: `${panel.width}%`,
+                        height: `${panel.height}%`,
+                        animationDelay: `${idx * 100}ms`,
+                        boxShadow: '0 0 10px rgba(74, 222, 128, 0.3)',
+                      }}
+                    >
+                      <span className="absolute -top-5 left-0 text-[10px] text-green-400 bg-black/70 px-1 rounded">
+                        P{idx + 1}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {/* Detecting indicator */}
+              {isDetecting && (
+                <div className="absolute top-2 right-2 bg-black/70 backdrop-blur-sm rounded-lg px-3 py-1.5 flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                  <span className="text-xs text-green-400">Detectando painéis...</span>
+                </div>
+              )}
+              {/* Panel zoom indicator */}
+              {panelZoom && (
+                <div className="absolute top-2 left-2 bg-black/70 backdrop-blur-sm rounded-lg px-3 py-1.5 flex items-center gap-2">
+                  <span className="text-xs text-cyan-400">🎯 Zoom no painel (duplo clique para sair)</span>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

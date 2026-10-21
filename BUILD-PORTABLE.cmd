@@ -3,7 +3,7 @@ setlocal enabledelayedexpansion
 
 echo.
 echo ============================================
-echo   NekoReader - Build Portable EXE
+echo   NekkoReader - Build Portable EXE
 echo ============================================
 echo.
 
@@ -100,7 +100,7 @@ echo ============================================
 echo   OK: EXE Generated Successfully!
 echo ============================================
 echo.
-echo File: release\NekoReader-portable.exe
+echo File: release\NekkoReader-portable.exe
 echo.
 echo You can copy this file anywhere and run it!
 echo.

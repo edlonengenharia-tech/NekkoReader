@@ -1,6 +1,8 @@
-# NekoReader - Manga, Comic and Book Reader
+# NekkoReader - Manga, Comic and Book Reader
 
 Windows desktop application built with Electron + React + TypeScript + Tailwind CSS.
+
+**Features inspired by AutoComix v2.20.0**
 
 ## Requirements
 
@@ -29,7 +31,7 @@ TESTE-NPM.cmd
 BUILD-PORTABLE.cmd
 ```
 
-Output: `release\NekoReader-portable.exe`
+Output: `release\NekkoReader-portable.exe`
 
 ### Generate Installer (with file associations)
 
@@ -37,7 +39,58 @@ Output: `release\NekoReader-portable.exe`
 BUILD-INSTALLER.cmd
 ```
 
-Output: `release\NekoReader-installer.exe`
+Output: `release\NekkoReader-installer.exe`
+
+## Features
+
+### Core Features
+- Library with search and filters
+- Manga mode (right-to-left)
+- Double page view
+- Adjustable zoom
+- Fullscreen
+- 3 themes: Dark, Midnight, Light (with live preview)
+- Smooth animations
+- Progress HUD
+- AI panel (Qwen/OpenAI)
+- Reading progress persistence
+- Drag & drop files
+- Windows file associations
+- Custom frameless window
+- Power save blocker during reading
+
+### AutoComix Features (v2.20.0)
+- **Panel Detection**: Automatically detects panels/frames on pages using ML
+- **Auto Panel Rotation**: Panels that would be larger when rotated are automatically turned (useful for tablets/rotatable monitors)
+- **Panel Zoom on Double-Click**: Double-click a panel to zoom into it
+- **GPU Acceleration**: Uses DirectML on Windows for faster panel detection (NVIDIA, AMD, Intel cards with DirectX 12)
+- **Automatic Fallback**: Falls back to CPU if GPU is not available or slower
+
+## Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| `Left/Right` | Navigate pages |
+| `Home` | First page |
+| `End` | Last page |
+| `F` | Fullscreen |
+| `M` | Manga mode (RTL) |
+| `D` | Double page |
+| `Tab` | Toggle library |
+| `+` `-` | Zoom |
+| `Ctrl + Scroll` | Fine zoom |
+| `Esc` | Exit fullscreen |
+| `Double-click panel` | Zoom to panel |
+
+## Supported Formats
+
+| Format | Description |
+|--------|-------------|
+| `.cbz` | Comic Book ZIP |
+| `.cbr` | Comic Book RAR |
+| `.cbt` | Comic Book TAR |
+| `.cb7` | Comic Book 7Z |
+| `.pdf` | PDF Document |
 
 ## Manual Commands
 
@@ -64,52 +117,10 @@ npm run electron:build
 npm run electron:installer
 ```
 
-## Supported Formats
-
-| Format | Description |
-|--------|-------------|
-| `.cbz` | Comic Book ZIP |
-| `.cbr` | Comic Book RAR |
-| `.cbt` | Comic Book TAR |
-| `.cb7` | Comic Book 7Z |
-| `.pdf` | PDF Document |
-
-## Keyboard Shortcuts
-
-| Key | Action |
-|-----|--------|
-| `Left/Right` | Navigate pages |
-| `Home` | First page |
-| `End` | Last page |
-| `F` | Fullscreen |
-| `M` | Manga mode (RTL) |
-| `D` | Double page |
-| `Tab` | Toggle library |
-| `+` `-` | Zoom |
-| `Ctrl + Scroll` | Fine zoom |
-| `Esc` | Exit fullscreen |
-
-## Features
-
-- Library with search and filters
-- Manga mode (right-to-left)
-- Double page view
-- Adjustable zoom
-- Fullscreen
-- 3 themes: Dark, Midnight, Light
-- Smooth animations
-- Progress HUD
-- AI panel (Qwen/OpenAI)
-- Reading progress persistence
-- Drag & drop files
-- Windows file associations
-- Custom frameless window
-- Power save blocker during reading
-
 ## Project Structure
 
 ```
-nekoreader/
+nekkoreader/
   electron/              # Electron files (CommonJS)
     main.cjs            # Main process
     preload.cjs         # Secure bridge
@@ -130,6 +141,34 @@ nekoreader/
   BUILD-PORTABLE.cmd    # Build portable EXE
   BUILD-INSTALLER.cmd   # Build NSIS installer
 ```
+
+## Settings
+
+### Reading Tab
+- Manga mode (RTL) by default
+- Double page by default
+- Fit mode (width/height/page)
+- Page flip animation
+- Click zones for navigation
+- Prefetch pages
+
+### Interface Tab
+- Theme selection (Dark/Midnight/Light) with live preview
+- Show library on startup
+
+### AutoComix Tab
+- Panel detection (ML-based)
+- Panel zoom on double-click
+- Auto-rotate panels
+- Rotation direction (clockwise/counterclockwise)
+- Rotation threshold (1.1x - 2.0x)
+- GPU acceleration (DirectML)
+
+### AI Tab
+- Qwen (Alibaba DashScope)
+- OpenAI Compatible (Ollama, LM Studio)
+- API key configuration
+- Connection testing
 
 ## Troubleshooting
 
@@ -152,6 +191,10 @@ npm install
 node electron/fix-paths.cjs
 ```
 
+### Themes not applying
+- Click OK in Options dialog to save theme
+- Or click directly on theme preview for instant apply
+
 ## Custom Icon
 
 1. Create a 512x512 PNG image
@@ -167,3 +210,5 @@ Built with:
 - [TypeScript](https://www.typescriptlang.org/)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Vite](https://vitejs.dev/)
+
+Features inspired by [AutoComix](https://github.com/SorbP/AutoComix) v2.20.0

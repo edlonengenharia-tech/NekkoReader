@@ -17,6 +17,13 @@ const defaultSettings: Settings = {
   animation: true,
   clickZones: true,
   prefetchPages: 2,
+  // AutoComix features
+  panelDetection: true,
+  autoRotatePanels: false,
+  rotateDirection: 'clockwise',
+  rotateThreshold: 1.3,
+  panelZoomOnDblClick: true,
+  gpuAcceleration: true,
 };
 
 export default function App() {
@@ -35,6 +42,7 @@ export default function App() {
   // Apply theme
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', settings.theme);
+    document.body.className = getThemeClasses(settings.theme);
   }, [settings.theme]);
 
   // Fullscreen handling
@@ -160,8 +168,14 @@ export default function App() {
         onToggleLibrary={() => setShowSidebar(prev => !prev)}
         onToggleAI={() => setShowAI(prev => !prev)}
         onOptions={() => setShowOptions(true)}
+        onTogglePanelDetection={() => setSettings(prev => ({ ...prev, panelDetection: !prev.panelDetection }))}
+        onToggleAutoRotate={() => setSettings(prev => ({ ...prev, autoRotatePanels: !prev.autoRotatePanels }))}
+        onTogglePanelZoom={() => setSettings(prev => ({ ...prev, panelZoomOnDblClick: !prev.panelZoomOnDblClick }))}
         showAI={showAI}
         showLibrary={showSidebar}
+        panelDetection={settings.panelDetection}
+        autoRotatePanels={settings.autoRotatePanels}
+        panelZoomOnDblClick={settings.panelZoomOnDblClick}
       />
 
       <div className="flex flex-1 overflow-hidden">

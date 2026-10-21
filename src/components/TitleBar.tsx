@@ -5,11 +5,30 @@ interface TitleBarProps {
   onToggleLibrary: () => void;
   onToggleAI: () => void;
   onOptions: () => void;
+  onTogglePanelDetection: () => void;
+  onToggleAutoRotate: () => void;
+  onTogglePanelZoom: () => void;
   showAI: boolean;
   showLibrary: boolean;
+  panelDetection: boolean;
+  autoRotatePanels: boolean;
+  panelZoomOnDblClick: boolean;
 }
 
-export default function TitleBar({ onOpen, onToggleLibrary, onToggleAI, onOptions, showAI, showLibrary }: TitleBarProps) {
+export default function TitleBar({ 
+  onOpen, 
+  onToggleLibrary, 
+  onToggleAI, 
+  onOptions,
+  onTogglePanelDetection,
+  onToggleAutoRotate,
+  onTogglePanelZoom,
+  showAI, 
+  showLibrary,
+  panelDetection,
+  autoRotatePanels,
+  panelZoomOnDblClick
+}: TitleBarProps) {
   const handleMinimize = async () => {
     if (isElectron) await electronAPI.minimize();
   };
@@ -40,7 +59,7 @@ export default function TitleBar({ onOpen, onToggleLibrary, onToggleAI, onOption
     >
       <div className="flex items-center gap-2" style={isElectron ? { WebkitAppRegion: 'no-drag' } as React.CSSProperties : undefined}>
         <span className="text-lg font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
-          🐱 NekoReader
+          🐱 NekkoReader
         </span>
         <button
           onClick={handleOpen}
@@ -57,6 +76,39 @@ export default function TitleBar({ onOpen, onToggleLibrary, onToggleAI, onOption
           }`}
         >
           📚 Biblioteca
+        </button>
+        <button
+          onClick={onTogglePanelDetection}
+          className={`px-3 py-1 text-xs rounded-full transition-colors border ${
+            panelDetection
+              ? 'bg-green-600/30 border-green-500/50 text-green-300'
+              : 'bg-gray-800 hover:bg-gray-700 text-gray-300 border-gray-700'
+          }`}
+          title="Detecção de painéis (AutoComix)"
+        >
+          🔍 Painéis
+        </button>
+        <button
+          onClick={onToggleAutoRotate}
+          className={`px-3 py-1 text-xs rounded-full transition-colors border ${
+            autoRotatePanels
+              ? 'bg-orange-600/30 border-orange-500/50 text-orange-300'
+              : 'bg-gray-800 hover:bg-gray-700 text-gray-300 border-gray-700'
+          }`}
+          title="Rotação automática de painéis"
+        >
+          🔄 Auto-Rotação
+        </button>
+        <button
+          onClick={onTogglePanelZoom}
+          className={`px-3 py-1 text-xs rounded-full transition-colors border ${
+            panelZoomOnDblClick
+              ? 'bg-cyan-600/30 border-cyan-500/50 text-cyan-300'
+              : 'bg-gray-800 hover:bg-gray-700 text-gray-300 border-gray-700'
+          }`}
+          title="Zoom em painel com duplo clique"
+        >
+          🎯 Zoom Painel
         </button>
         <button
           onClick={onToggleAI}
